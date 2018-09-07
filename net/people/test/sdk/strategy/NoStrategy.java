@@ -4,7 +4,7 @@ import net.people.test.sdk.rule.ISecurityStrategy;
 
 public class NoStrategy implements ISecurityStrategy {
     @Override
-    public String encrypt(String data) {
+    public Object encrypt(String data) {
         return data;
     }
 }

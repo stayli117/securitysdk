@@ -2,8 +2,8 @@ package net.people.ocr.sec;
 
 import android.util.Log;
 
+import net.people.ocr.User;
 import net.people.test.sdk.Security;
-import net.people.test.sdk.rule.Call;
 
 public class LoginManager{
 
@@ -29,36 +29,36 @@ public class LoginManager{
         String userName = "18567677596";
         String pwd = "pwd18567677596";
 
-        Call<String> login = service.login(userName, pwd);
+        User login = service.login(userName, pwd, User.class);
 
-        Log.e(TAG, "login: " + login.execute(0));
-        Log.e(TAG, "login: " + login.execute(1));
+        Log.e(TAG, "login: " + login.name);
+        Log.e(TAG, "login: " + login.age);
 
 
     }
 
     public static String aes(boolean isBase, boolean save, String value) {
 
-        Call<String> call = service.aes(value);
+        String call = service.aes(value);
         if (isBase) {
             call = save ? service.aessavebase(value) : service.aesbase(value);
         }
         if (save) {
             call = isBase ? service.aessavebase(value) : service.aessave(value);
         }
-        return call.execute(0);
+        return call;
 
 
     }
 
     public static String des(boolean isBase, boolean save, String value) {
-        Call<String> call = service.des(value);
+        String call = service.des(value);
         if (isBase) {
             call = save ? service.dessavebase(value) : service.desbase(value);
         }
         if (save) {
             call = isBase ? service.dessavebase(value) : service.dessave(value);
         }
-        return call.execute(0);
+        return call;
     }
 }

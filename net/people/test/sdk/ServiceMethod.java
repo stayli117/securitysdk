@@ -15,7 +15,7 @@ public class ServiceMethod {
     private String methodName;
     private String methodValue;
     private Annotation[][] parameterAnnotationsArray;
-    CallAdapter adapter;
+    public CallAdapter adapter;
     private Type[] parameterTypes;
     private Converter converter;
     private ParameterHandle<Object>[] handles;
@@ -76,12 +76,11 @@ public class ServiceMethod {
             Annotation[] annotations = method.getAnnotations();
 
 
-            return security.callAdapter(returnType, annotations);
+            return security.callAdapter(method, annotations);
         }
 
         public ServiceMethod build() {
             callAdapter = createCallAdapter(method);
-            responseType = callAdapter.responseType();
             converter = createResponseConverter(method);
             for (Annotation annotation : methodAnnotations) {
                 parseMethodAnnotation(annotation);
@@ -119,6 +118,7 @@ public class ServiceMethod {
             return result;
         }
 
+        // 解析参数注解
         private ParameterHandle<Object> parseParamterAnnotation(int i, Type type, Annotation annotation, ParameterHandle<Object> security) {
             security.isOpetion = true;
             security.index = i;
@@ -143,11 +143,11 @@ public class ServiceMethod {
         }
 
 
+        // 解析方法注解
         private void parseMethodAnnotation(Annotation annotation) {
             if (annotation instanceof Measure) {
                 parseMethodAnnotationAndValue("Measure", ((Measure) annotation).value());
             }
-
 
 
         }

@@ -19,33 +19,69 @@ import java.util.concurrent.Executor;
 public class Security {
 
 
-
+    private static final String TAG = "Security";
 
     private final Map<Method, ServiceMethod> serviceMethodCache = new ConcurrentHashMap<>();
 
     public <T> T registerService(final Class<T> service) {
-        return (T) Proxy.newProxyInstance(service.getClassLoader()
-                , new Class<?>[]{service},
-                new InvocationHandler() {
-                    @Override
-                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-                        ServiceMethod serviceMethod = loadServiceMethod(method);
+        if (!service.isInterface()) {
+            return createProxy(service);
+        }
 
-                        SecurityCall<Object> call = new SecurityCall<>(serviceMethod, args);
+        throw new IllegalStateException("declarations must not be interfaces ");
 
-                        return serviceMethod.adapter.adapt(call);
-                    }
-                });
+//        return (T) Proxy.newProxyInstance(service.getClassLoader()
+//                , new Class<?>[]{service},
+//                new InvocationHandler() {
+//                    @Override
+//                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+//
+//                        ServiceMethod serviceMethod = loadServiceMethod(method);
+//
+//                        SecurityCall<Object> call = new SecurityCall<>(serviceMethod, args);
+//
+//                        return serviceMethod.adapter.adapt(this, call);
+//
+//                    }
+//                });
+    }
+
+    private <T> T createProxy(final Class<T> service) {
+
+        T t;
+        T instance = null;
+        try {
+            instance = service.newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        Class<?>[] interfaces = service.getInterfaces();
+        if (interfaces.length > 1)
+            throw new IllegalStateException("interfaces must not extend other interfaces.");
+        final T finalInstance = instance;
+        t = (T) Proxy.newProxyInstance(service.getClassLoader(), interfaces, new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
+
+                ServiceMethod serviceMethod = loadServiceMethod(method); // 保存注解信息
+                SecurityCall<Object> call = new SecurityCall<>(serviceMethod, args);
+
+                return serviceMethod.adapter.adapt(finalInstance, call);
+            }
+        });
+
+
+        return t;
     }
 
 
-    private ServiceMethod loadServiceMethod(Method method) {
-
+    public ServiceMethod loadServiceMethod(Method method) {
         ServiceMethod result = serviceMethodCache.get(method);
-
         if (result != null) return result;
-
         synchronized (serviceMethodCache) {
             result = serviceMethodCache.get(method);
             if (result == null) {
@@ -56,11 +92,8 @@ public class Security {
         return result;
     }
 
-    public CallAdapter callAdapter(Type returnType, Annotation[] annotations) {
-
-
+    public CallAdapter callAdapter(Method method, Annotation[] annotations) {
         SecurityCallAdapterFactory adapterFactory = new SecurityCallAdapterFactory(new Executor() {
-
 
             final Handler handler = new Handler(Looper.getMainLooper());
 
@@ -70,15 +103,11 @@ public class Security {
             }
         });
 
-        return adapterFactory.get(returnType, annotations, this);
+        return adapterFactory.get(method, annotations, this);
     }
 
-//    Gson gson = new Gson();
 
     public Converter responseBodyConverter(Type responseType, Annotation[] methodAnnotations) {
-
-
-//        TypeAdapter<?> adapter = gson.getAdapter(TypeToken.get(responseType));
 
         return new GsonRConverter<>();
     }

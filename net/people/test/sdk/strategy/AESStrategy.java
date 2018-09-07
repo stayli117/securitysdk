@@ -4,7 +4,7 @@ import net.people.test.sdk.rule.ISecurityStrategy;
 
 public class AESStrategy implements ISecurityStrategy {
     @Override
-    public String encrypt(String data) {
+    public Object encrypt(String data) {
         return "经过AES处理之后的数据:" + data;
     }
 }

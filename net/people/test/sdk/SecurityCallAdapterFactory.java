@@ -4,7 +4,8 @@ import net.people.test.sdk.rule.Call;
 import net.people.test.sdk.rule.CallAdapter;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.concurrent.Executor;
 
 public class SecurityCallAdapterFactory implements CallAdapter.Factory {
@@ -16,30 +17,24 @@ public class SecurityCallAdapterFactory implements CallAdapter.Factory {
         this.executor = executor;
     }
 
-    public CallAdapter get(Type returnType, Annotation[] annotations, Security security) {
+    public CallAdapter get(final Method method, Annotation[] annotations, Security security) {
 
-        Class<?> rawType = getRawType(returnType);
-        if (rawType != Call.class) return null;
-
-        final Type responseType = Utils.getCallResponseType(returnType);
-
-        return new CallAdapter<Object, Call<?>>() {
+        return new CallAdapter<Object, Object>() {
             @Override
-            public Type responseType() {
-                return responseType;
+            public Method method() {
+                return method;
             }
 
             @Override
-            public Call<Object> adapt(Call<Object> call) {
-                return new ExecutorCallbackCall<>(executor, call);
+            public Object adapt(Object finalInstance, Call<Object> call) throws InvocationTargetException, IllegalAccessException {
+                ExecutorCallbackCall<Object> calla = new ExecutorCallbackCall<>(executor, call);
+                Object[] execute = calla.execute();
+                return method.invoke(finalInstance, execute);
             }
+
         };
 
 
-    }
-
-    public static Class<?> getRawType(Type returnType) {
-        return Utils.getRawType(returnType);
     }
 
     static final class ExecutorCallbackCall<T> implements Call<T> {
@@ -52,8 +47,8 @@ public class SecurityCallAdapterFactory implements CallAdapter.Factory {
         }
 
         @Override
-        public T execute(int i) {
-            return securityCall.execute(i);
+        public Object[] execute() {
+            return securityCall.execute();
         }
 
     }

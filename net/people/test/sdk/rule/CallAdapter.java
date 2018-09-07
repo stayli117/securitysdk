@@ -1,14 +1,15 @@
 package net.people.test.sdk.rule;
 
-import java.lang.reflect.Type;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public interface CallAdapter<R, T> {
 
 
-    Type responseType();
+    Method method();
 
 
-    T adapt(Call<R> call);
+    R adapt(T finalInstance, Call<T> call) throws InvocationTargetException, IllegalAccessException;
 
     public interface Factory {
     }

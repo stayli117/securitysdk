@@ -1,5 +1,5 @@
 package net.people.test.sdk.rule;
 
 public interface ISecurityStrategy {
-    String encrypt(String data);
+    Object encrypt(String data);
 }

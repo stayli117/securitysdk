@@ -13,7 +13,7 @@ public class SecurityStrategy implements ISecurityStrategy {
     }
 
     @Override
-    public String encrypt(String data) {
+    public Object encrypt(String data) {
 
         return get().encrypt(data);
     }

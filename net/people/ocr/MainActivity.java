@@ -10,6 +10,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
 import net.people.ocr.sec.LoginManager;
 
 
@@ -66,7 +68,14 @@ public class MainActivity extends Activity {
         });
 
 
+        try {
+            testGson();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
+
 
     private void security(int checkedId, boolean base, boolean save) {
         value = mValue.getText().toString().trim();
@@ -83,5 +92,21 @@ public class MainActivity extends Activity {
         }
     }
 
+
+    private void testGson() throws NoSuchFieldException {
+        Gson gson = new Gson();
+        String strJson = "{name:'david',age:19,room:{roomName:'small',number:1}}";
+
+        User u = gson.fromJson(strJson, User.class);
+
+//        User user = getUser("abc", User.class);
+
+    }
+
+//    public <T> T getUser(@Save("name") String u, Type clazz) throws NoSuchFieldException {
+//
+//
+//
+//    }
 
 }

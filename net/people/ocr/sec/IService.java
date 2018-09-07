@@ -1,51 +1,42 @@
 package net.people.ocr.sec;
 
+import net.people.ocr.User;
 import net.people.test.sdk.annotation.BASE64;
 import net.people.test.sdk.annotation.Measure;
 import net.people.test.sdk.annotation.Save;
-import net.people.test.sdk.rule.Call;
+
+import java.lang.reflect.Type;
 
 public interface IService {
 
     @Measure("aes")
-    Call<String> login(@BASE64 String un, String pwd);
-
-
-
-
-
-
-
-
-
-
+    User login(@Save("name") String un, String pwd, Type type);
 
 
     @Measure("aes")
-    Call<String> aes(String value);
+    String aes(String value);
 
     @Measure("aes")
-    Call<String> aesbase(@BASE64 String value);
+    String aesbase(@BASE64 String value);
 
     @Measure("aes")
-    Call<String> aessave(@Save("aes") String value);
+    String aessave(@Save("aes") String value);
 
     @Measure("aes")
-    Call<String> aessavebase(@BASE64 @Save("aesbase") String value);
+    String aessavebase(@BASE64 @Save("aesbase") String value);
 
 
     @Measure("des")
-    Call<String> des(String value);
+    String des(String value);
 
     @Measure("des")
-    Call<String> desbase(@BASE64 String value);
+    String desbase(@BASE64 String value);
 
     @Measure("aes")
-    Call<String> dessave(@Save("des") String value);
+    String dessave(@Save("des") String value);
 
     @Measure("aes")
-    Call<String> dessavebase(@BASE64 @Save("desbase") String value);
-
+    String dessavebase(@BASE64 @Save("desbase") String value);
 
 
 }
